@@ -7,7 +7,34 @@ module.exports = function (app) {
   let solver = new SudokuSolver();
 
   app.route("/api/check").post((req, res) => {
-    let puzzle = solver.convertPuzzleToArray(req.body.puzzle); //This function is dividing the string in an array of 9 strings.
+    let puzzleString = req.body.puzzle;
+
+    if (
+      !puzzleString ||
+      puzzleString === "" ||
+      !req.body.coordinate ||
+      req.body.coordinate === "" ||
+      !req.body.value ||
+      req.body.value === ""
+    ) {
+      return res.json({
+        error: "Required field(s) missing",
+      });
+    }
+
+    if (!solver.validate(puzzleString)) {
+      return res.json({
+        error: "Invalid characters in puzzle",
+      });
+    }
+
+    if (puzzleString.length !== 81) {
+      return res.json({
+        error: "Expected puzzle to be 81 characters long",
+      });
+    }
+
+    let puzzle = solver.convertPuzzleToArray(puzzleString); //This function is dividing the string in an array of 9 strings.
     let row = req.body.coordinate[0].toUpperCase();
     let column = req.body.coordinate[1];
     let value = req.body.value;
@@ -15,24 +42,6 @@ module.exports = function (app) {
     let rowLetter = "ABCDEFGHI";
     row = rowLetter.indexOf(row); // Use index instead of letters.
     column--; // The index for the column starts at 1 in the HTML, but here it will start at 0.
-
-    if (!puzzle || puzzle === "") {
-      return res.json({
-        error: "Required field missing",
-      });
-    }
-
-    if (!solver.validate(puzzle)) {
-      return res.json({
-        error: "Invalid characters in puzzle",
-      });
-    }
-
-    if (puzzle.length !== 81) {
-      return res.json({
-        error: "Expected puzzle to be 81 characters long",
-      });
-    }
 
     if (value === puzzle[row][column]) {
       return res.json({ valid: true });
