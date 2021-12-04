@@ -1,19 +1,43 @@
 "use strict";
 
+const { puzzlesAndSolutions } = require("../controllers/puzzle-strings.js");
 const SudokuSolver = require("../controllers/sudoku-solver.js");
 
 module.exports = function (app) {
   let solver = new SudokuSolver();
 
   app.route("/api/check").post((req, res) => {
-    let puzzle = solver.convertPuzzleToArray(req.body.puzzle);
-    let row = req.body.coordinate[0];
+    let puzzle = solver.convertPuzzleToArray(req.body.puzzle); //This function is dividing the string in an array of 9 strings.
+    let row = req.body.coordinate[0].toUpperCase();
     let column = req.body.coordinate[1];
     let value = req.body.value;
 
     let rowLetter = "ABCDEFGHI";
     row = rowLetter.indexOf(row); // Use index instead of letters.
     column--; // The index for the column starts at 1 in the HTML, but here it will start at 0.
+
+    if (!puzzle || puzzle === "") {
+      return res.json({
+        error: "Required field missing",
+      });
+    }
+
+    if (!solver.validate(puzzle)) {
+      return res.json({
+        error: "Invalid characters in puzzle",
+      });
+    }
+
+    if (puzzle.length !== 81) {
+      return res.json({
+        error: "Expected puzzle to be 81 characters long",
+      });
+    }
+
+    if (value === puzzle[row][column]) {
+      return res.json({ valid: true });
+    }
+
     if (
       solver.checkRowPlacement(puzzle, row, value) === false &&
       solver.checkColPlacement(puzzle, column, value) === false &&
@@ -40,6 +64,41 @@ module.exports = function (app) {
   });
 
   app.route("/api/solve").post((req, res) => {
+    let puzzle = req.body.puzzle;
+
+    if (!puzzle || puzzle === "") {
+      return res.json({
+        error: "Required field missing",
+      });
+    }
+
+    if (!solver.validate(puzzle)) {
+      return res.json({
+        error: "Invalid characters in puzzle",
+      });
+    }
+
+    if (puzzle.length !== 81) {
+      return res.json({
+        error: "Expected puzzle to be 81 characters long",
+      });
+    }
+
+    for (let i = 0; i < puzzle.length; i++) {
+      for (let j = 0; j < puzzle[i].length; j++) {
+        if (
+          puzzle[i][j] !== "." &&
+          (solver.checkRowPlacement(puzzle, i, puzzle[i][j]) === true ||
+            solver.checkColPlacement(puzzle, j, puzzle[i][j]) === true ||
+            solver.checkRegionPlacement(puzzle, i, j, puzzle[i][j]) === true)
+        ) {
+          return res.json({
+            error: "Puzzle cannot be solved",
+          });
+        }
+      }
+    }
+
     let solution = solver.solve(req.body.puzzle);
     for (let i = 0; i < solution.length; i++) {
       solution[i] = solution[i].join("");

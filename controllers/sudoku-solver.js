@@ -201,7 +201,14 @@ class SudokuSolver {
     return this.resolvePuzzle(possibilitiesArray);
   }
 
-  validate(puzzleString) {}
+  validate(puzzleString) {
+    if (puzzleString.match(/[^1-9\.]/)) {
+      //^ matches the opossite of the regex (matches not number and not period)
+      return false;
+    } else {
+      return true;
+    }
+  }
 }
 
 module.exports = SudokuSolver;
