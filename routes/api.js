@@ -39,7 +39,7 @@ module.exports = function (app) {
     let column = req.body.coordinate[1];
     let value = req.body.value;
 
-    if (parseInt(value) < 1 || parseInt(value) > 9) {
+    if (isNaN(value) || parseInt(value) < 1 || parseInt(value) > 9) {
       return res.json({
         error: "Invalid value",
       });
