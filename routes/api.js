@@ -37,11 +37,29 @@ module.exports = function (app) {
     let puzzle = solver.convertPuzzleToArray(puzzleString); //This function is dividing the string in an array of 9 strings.
     let row = req.body.coordinate[0].toUpperCase();
     let column = req.body.coordinate[1];
-    let value = req.body.value;
+    let value = parseInt(req.body.value);
+
+    if (value < 1 || value > 10) {
+      return res.json({
+        error: "Invalid value",
+      });
+    }
+
+    if (req.body.coordinate.length > 2) {
+      return res.json({
+        error: "Invalid coordinate",
+      });
+    }
 
     let rowLetter = "ABCDEFGHI";
     row = rowLetter.indexOf(row); // Use index instead of letters.
     column--; // The index for the column starts at 1 in the HTML, but here it will start at 0.
+
+    if (row === -1 || column > 8 || column < 0) {
+      return res.json({
+        error: "Invalid coordinate",
+      });
+    }
 
     if (value === puzzle[row][column]) {
       return res.json({ valid: true });
