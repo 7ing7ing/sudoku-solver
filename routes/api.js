@@ -93,21 +93,32 @@ module.exports = function (app) {
       });
     }
 
-    for (let i = 0; i < puzzle.length; i++) {
-      for (let j = 0; j < puzzle[i].length; j++) {
-        if (
-          puzzle[i][j] !== "." &&
-          (solver.checkRowPlacement(puzzle, i, puzzle[i][j]) === true ||
-            solver.checkColPlacement(puzzle, j, puzzle[i][j]) === true ||
-            solver.checkRegionPlacement(puzzle, i, j, puzzle[i][j]) === true)
-        ) {
-          return res.json({
-            error: "Puzzle cannot be solved",
-          });
+    //Check if the sudoku can be solved or there are numbers repeated in row/column/region
+    let puzzleArray = solver.convertPuzzleToArray(puzzle);
+    for (let i = 0; i < puzzleArray.length; i++) {
+      for (let j = 0; j < puzzleArray[i].length; j++) {
+        if (puzzleArray[i][j] !== ".") {
+          let number = puzzleArray[i][j];
+          //Modidying puzzleArray[i][j] so the check functions don't detect the number from the position we are passing
+          //(since the number is going to exist in its own position)
+          puzzleArray[i] =
+            puzzleArray[i].substring(0, puzzleArray[i].indexOf(number)) +
+            "." +
+            puzzleArray[i].substring(puzzleArray[i].indexOf(number) + 1);
+          if (
+            solver.checkRowPlacement(puzzleArray, i, number) === true ||
+            solver.checkColPlacement(puzzleArray, j, number) === true ||
+            solver.checkRegionPlacement(puzzleArray, i, j, number) === true
+          ) {
+            return res.json({
+              error: "Puzzle cannot be solved",
+            });
+          }
         }
       }
     }
 
+    //Solve the sudoku
     let solution = solver.solve(req.body.puzzle);
     for (let i = 0; i < solution.length; i++) {
       solution[i] = solution[i].join("");
