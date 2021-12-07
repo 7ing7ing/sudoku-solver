@@ -66,34 +66,6 @@ class SudokuSolver {
     return false;
   }
 
-  checkPuzzleIsValid(puzzle) {
-    //Check if the sudoku can be solved or there are numbers repeated in row/column/region
-    let puzzleArray = this.convertPuzzleToArray(puzzle);
-    for (let i = 0; i < puzzleArray.length; i++) {
-      for (let j = 0; j < puzzleArray[i].length; j++) {
-        if (puzzleArray[i][j] !== ".") {
-          let number = puzzleArray[i][j];
-          //Modidying puzzleArray[i][j] so the check functions don't detect the number from the position we are passing
-          //(since the number is going to exist in its own position)
-          puzzleArray[i] =
-            puzzleArray[i].substring(0, puzzleArray[i].indexOf(number)) +
-            "." +
-            puzzleArray[i].substring(puzzleArray[i].indexOf(number) + 1);
-          if (
-            this.checkRowPlacement(puzzleArray, i, number) === true ||
-            this.checkColPlacement(puzzleArray, j, number) === true ||
-            this.checkRegionPlacement(puzzleArray, i, j, number) === true
-          ) {
-            return {
-              error: "Puzzle cannot be solved",
-            };
-          }
-        }
-      }
-    }
-    return "Puzzle is valid";
-  }
-
   deletePossibities(possibilitiesArray, row, column, value) {
     // Check row and delete possibilities
     for (let i = 0; i < possibilitiesArray[row].length; i++) {
@@ -240,13 +212,40 @@ class SudokuSolver {
       return {
         error: "Invalid characters in puzzle",
       };
-    } else if (puzzleString.length !== 81) {
+    }
+
+    if (puzzleString.length !== 81) {
       return {
         error: "Expected puzzle to be 81 characters long",
       };
-    } else {
-      return "Puzzle is valid";
     }
+
+    //Check if the sudoku can be solved or there are numbers repeated in row/column/region
+    let puzzleArray = this.convertPuzzleToArray(puzzleString);
+    for (let i = 0; i < puzzleArray.length; i++) {
+      for (let j = 0; j < puzzleArray[i].length; j++) {
+        if (puzzleArray[i][j] !== ".") {
+          let number = puzzleArray[i][j];
+          //Modidying puzzleArray[i][j] so the check functions don't detect the number from the position we are passing
+          //(since the number is going to exist in its own position)
+          puzzleArray[i] =
+            puzzleArray[i].substring(0, puzzleArray[i].indexOf(number)) +
+            "." +
+            puzzleArray[i].substring(puzzleArray[i].indexOf(number) + 1);
+          if (
+            this.checkRowPlacement(puzzleArray, i, number) === true ||
+            this.checkColPlacement(puzzleArray, j, number) === true ||
+            this.checkRegionPlacement(puzzleArray, i, j, number) === true
+          ) {
+            return {
+              error: "Puzzle cannot be solved",
+            };
+          }
+        }
+      }
+    }
+    //If it reaches this point, the puzzle is valid
+    return "Puzzle is valid";
   }
 }
 

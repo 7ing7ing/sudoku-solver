@@ -111,7 +111,6 @@ suite("UnitTests", () => {
     let result = "Puzzle is valid";
 
     assert.equal(solver.validate(puzzle), result);
-    assert.equal(solver.checkPuzzleIsValid(puzzle), result);
     assert.equal(solver.solve(puzzle), sudokuResolved);
     done();
   });
@@ -122,7 +121,6 @@ suite("UnitTests", () => {
     let result = "Puzzle is valid";
 
     assert.notEqual(solver.validate(puzzle), result);
-    assert.notEqual(solver.checkPuzzleIsValid(puzzle), result);
     done();
   });
 
