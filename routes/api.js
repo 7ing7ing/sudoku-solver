@@ -99,50 +99,19 @@ module.exports = function (app) {
       });
     }
 
-    if (!solver.validate(puzzle)) {
-      return res.json({
-        error: "Invalid characters in puzzle",
-      });
+    let validation = solver.validate(puzzle);
+    if (validation !== "Puzzle is valid") {
+      return res.json(validation);
     }
 
-    if (puzzle.length !== 81) {
-      return res.json({
-        error: "Expected puzzle to be 81 characters long",
-      });
-    }
-
-    //Check if the sudoku can be solved or there are numbers repeated in row/column/region
-    let puzzleArray = solver.convertPuzzleToArray(puzzle);
-    for (let i = 0; i < puzzleArray.length; i++) {
-      for (let j = 0; j < puzzleArray[i].length; j++) {
-        if (puzzleArray[i][j] !== ".") {
-          let number = puzzleArray[i][j];
-          //Modidying puzzleArray[i][j] so the check functions don't detect the number from the position we are passing
-          //(since the number is going to exist in its own position)
-          puzzleArray[i] =
-            puzzleArray[i].substring(0, puzzleArray[i].indexOf(number)) +
-            "." +
-            puzzleArray[i].substring(puzzleArray[i].indexOf(number) + 1);
-          if (
-            solver.checkRowPlacement(puzzleArray, i, number) === true ||
-            solver.checkColPlacement(puzzleArray, j, number) === true ||
-            solver.checkRegionPlacement(puzzleArray, i, j, number) === true
-          ) {
-            return res.json({
-              error: "Puzzle cannot be solved",
-            });
-          }
-        }
-      }
+    let puzzleCheck = solver.checkPuzzleIsValid(puzzle);
+    if (puzzleCheck !== "Puzzle is valid") {
+      return res.json(puzzleCheck);
     }
 
     //Solve the sudoku
     let solution = solver.solve(req.body.puzzle);
-    for (let i = 0; i < solution.length; i++) {
-      solution[i] = solution[i].join("");
-    }
 
-    solution = solution.join("");
     return res.json({
       solution: solution,
     });
