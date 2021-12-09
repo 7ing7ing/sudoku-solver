@@ -22,16 +22,9 @@ module.exports = function (app) {
       });
     }
 
-    if (!solver.validate(puzzleString)) {
-      return res.json({
-        error: "Invalid characters in puzzle",
-      });
-    }
-
-    if (puzzleString.length !== 81) {
-      return res.json({
-        error: "Expected puzzle to be 81 characters long",
-      });
+    let validation = solver.validate(puzzle);
+    if (validation !== "Puzzle is valid") {
+      return res.json(validation);
     }
 
     let puzzle = solver.convertPuzzleToArray(puzzleString); //This function is dividing the string in an array of 9 strings.
@@ -104,14 +97,9 @@ module.exports = function (app) {
       return res.json(validation);
     }
 
-    let puzzleCheck = solver.checkPuzzleIsValid(puzzle);
-    if (puzzleCheck !== "Puzzle is valid") {
-      return res.json(puzzleCheck);
-    }
-
     //Solve the sudoku
     let solution = solver.solve(req.body.puzzle);
-
+    console.log(solution);
     return res.json({
       solution: solution,
     });
