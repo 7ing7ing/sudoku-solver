@@ -22,7 +22,8 @@ module.exports = function (app) {
       });
     }
 
-    let validation = solver.validate(puzzle);
+    let validation = solver.validate(puzzleString);
+    console.log(validation);
     if (validation !== "Puzzle is valid") {
       return res.json(validation);
     }
