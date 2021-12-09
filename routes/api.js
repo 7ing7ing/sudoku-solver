@@ -23,7 +23,6 @@ module.exports = function (app) {
     }
 
     let validation = solver.validate(puzzleString);
-    console.log(validation);
     if (validation !== "Puzzle is valid") {
       return res.json(validation);
     }
@@ -100,7 +99,6 @@ module.exports = function (app) {
 
     //Solve the sudoku
     let solution = solver.solve(req.body.puzzle);
-    console.log(solution);
     return res.json({
       solution: solution,
     });
