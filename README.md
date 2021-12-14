@@ -9,6 +9,7 @@
 :wrench:Technologies used:
 
 - Node.js
+- API's
 - Mocha, Chai
 
 
