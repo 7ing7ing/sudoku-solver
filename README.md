@@ -13,7 +13,7 @@ An error will show up if a sudoku cannot be solved, if there is a invalid charac
 
 :link:Link:
 
-- https://sudoku-solver-0ukg.onrender.com
+- https://sudoku-solver-five-ebon.vercel.app/
 
 📝 Comments:
 
